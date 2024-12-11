@@ -1,0 +1,14 @@
+---
+server:
+  debug: true
+
+plugins:
+  funda:
+    active: true
+    settings:
+
+comm:
+  pushover:
+    active: true
+    api_key: APIKEY_HERE
+    user_key: USERKEY_HERE

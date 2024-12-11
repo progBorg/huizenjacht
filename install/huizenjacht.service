@@ -1,0 +1,14 @@
+[Unit]
+Description=Scrape and push newly available housing
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/share/huizenjacht
+Restart=on-failure
+PIDFile=/run/huizenjacht.pid
+ExecStart=/usr/bin/python3 /usr/local/bin/huizenjacht.py -c /etc/huizenjacht.yaml
+
+[Install]
+WantedBy=multi-user.target
