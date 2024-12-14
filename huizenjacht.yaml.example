@@ -1,6 +1,6 @@
 ---
 server:
-  debug: true
+  debug: false
 
 plugins:
   funda:

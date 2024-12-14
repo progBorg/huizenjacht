@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# gprsim.py
+# huizenjacht.py
 # author: Tom Veldman
 # (c) 2024
 # MIT license
@@ -11,25 +11,28 @@ import logging
 # Some constants
 PROGRAM_VERSION: str = "0.1"
 
-
 def main():
     # Parse command-line arguments
     args = parse_arguments()
 
     # Set up logging, include systemd Journal support
     logging.basicConfig()
-    log = logging.getLogger('huizenjacht')
+    logger = logging.getLogger()
 
     # Set up the configuration file parser
-    conf = configparser.ConfigParser()
-    conf.read(args.configfile)
+    with open(args.configfile, 'r') as stream:
+        try:
+            conf = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            logging.error("An error occured when attempting to parse the configuration file %s", args.configfile)
+            return 1
 
     # Parse verbosity
-    if args.verbose or conf.getboolean('server', 'debug'):
-        log.setLevel(logging.DEBUG)
-        log.debug("Running in verbose mode")
+    if args.verbose or conf['server']['debug']:
+        logger.setLevel(logging.DEBUG)
+        logger.debug("Running in verbose mode")
     else:
-        log.setLevel(logging.INFO)
+        logger.setLevel(logging.INFO)
 
 
 
@@ -46,4 +49,5 @@ def parse_arguments():
 
 
 if __name__ == "__main__":
-    main()
+    exit_code = main()
+    exit(exit_code)
