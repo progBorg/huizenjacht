@@ -4,10 +4,10 @@ Scrape housing websites and push new results to the user.
 ## Features
 
 ### Sources
--[x] Funda scraper
+- [x] Funda scraper
 
 ### Communication methods
--[x] Pushover
+- [x] Pushover
 
 ## Prerequisites
 This package has been built for Python v3.10 on Linux.
