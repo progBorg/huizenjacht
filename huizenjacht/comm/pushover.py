@@ -1,5 +1,6 @@
 from .comm_intf import Comm
 import logging
+import chump
 
 class Pushover(Comm):
     logger = logging.getLogger(__name__)

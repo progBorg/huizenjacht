@@ -7,6 +7,7 @@
 import argparse
 import yaml
 import logging
+from config import Config
 
 # Some constants
 PROGRAM_VERSION: str = "0.1"
@@ -19,13 +20,11 @@ def main():
     logging.basicConfig()
     logger = logging.getLogger()
 
-    # Set up the configuration file parser
-    with open(args.configfile, 'r') as stream:
-        try:
-            conf = yaml.safe_load(stream)
-        except yaml.YAMLError as exc:
-            logging.error("An error occured when attempting to parse the configuration file %s", args.configfile)
-            return 1
+    logger.debug(f"Importing configuration from {args.configfile}")
+    # set up global configuration
+    Config(config_file=args.configfile)
+    conf = Config().config
+
 
     # Parse verbosity
     if args.verbose or conf['server']['debug']:
