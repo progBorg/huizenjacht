@@ -1,19 +1,27 @@
 import yaml
 import logging
 from pathlib import Path
-from singleton import SingletonMeta
+from huizenjacht.utils.singleton import SingletonMeta
 
 class Config(metaclass=SingletonMeta):
-    logger = logging.getLogger(__name__)
+    # Some constants
+    LOAD_TXT = "^TXT"
 
+    # Public class attributes
+    logger: logging.Logger
     config_file: str = None  # Location of default config file
+
+    # Private class attributes
     _loaded_config_file: str = None  # Location of currently loaded config file
     _config: dict = None  # Loaded configuration
 
     def __init__(self, config_file: str = None):
+        self.logger = logging.getLogger(__name__)
+
         if config_file is not None:
             self.config_file = config_file
 
+    """Load config from config_file attribute or parameter"""
     def load(self, config_file: str = None):
         # Get desired config file location
         if config_file is None:
@@ -23,21 +31,41 @@ class Config(metaclass=SingletonMeta):
         with open(config_file, 'r') as stream:
             try:
                 self._config = yaml.safe_load(stream)
-            except yaml.YAMLError:
-                self.logger.error("An error occured when attempting to parse the configuration file %s", self.config_file)
-                return None
+            except yaml.YAMLError as e:
+                self.logger.error(
+                    "An error occurred when attempting to parse the configuration file %s",
+                    self.config_file,
+                    exc_info=e
+                )
+                raise e
 
         self._loaded_config_file = config_file
 
+    """Alias for load()"""
+    load_file = load
+
+    """Load provided YAML string as configuration"""
+    def load_text(self, text: str):
+        # Attempt to load provided text as config
+        try:
+            self._config = yaml.safe_load(text)
+        except yaml.YAMLError as e:
+            self.logger.error(
+                "An error occurred when attempting to parse the configuration string %s",
+                text,
+                exc_info=e)
+            raise e
+
+        self._loaded_config_file = self.LOAD_TXT
+
+    """
+    Main configuration getter, autoloads config file if not already loaded
+    """
     @property
     def config(self) -> type(_config):
         # Don't load config if it already exists
         if self._config is not None:
             return self._config
-
-        # Sanity check
-        if self.config_file is None:
-            raise ValueError("No config file was specified")
 
         # Load config and return
         self.load()
