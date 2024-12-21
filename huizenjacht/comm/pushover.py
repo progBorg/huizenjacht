@@ -4,7 +4,7 @@ from huizenjacht.config import Config
 import time
 import logging
 import chump
-import requests
+from urllib.parse import urlparse
 
 class Pushover(Comm):
     # Public class attributes
@@ -14,20 +14,28 @@ class Pushover(Comm):
     # Private class attributes
     _pushover: chump.Application
     _rcpt: chump.User
+    _default_title: str
 
     def __init__(self):
         self.logger = logging.getLogger(__name__)
-        self.conf = Config().config['comm']['pushover']
+
+        conf = Config().config
+        self._default_title = conf['server']['message_defaults']['title']
+        self.conf = conf['comm']['pushover']
         self._sanity_check_conf()
 
         self._pushover = chump.Application(token=self.conf['api_key'])
         self._rcpt = self._pushover.get_user(self.rcpt)
 
-    def send(self, msg: str) -> chump.Message | None:
+    def send(self, msg: str, title: str = None, url: str = None) -> chump.Message | None:
         if len(str(msg)) == 0:
             return None
 
-        message = self._rcpt.create_message(msg)
+        if title is None:
+            title = self._default_title
+
+        url_title = urlparse(url).netloc
+        message = self._rcpt.create_message(message=msg, title=title, url=url, url_title=url_title)
         message.send()
         return message
 
@@ -65,11 +73,22 @@ if __name__ == "__main__":
     # Quick functionality tests for this class
     conf_text = """
 ---
+server:
+  debug: false
+  message_defaults:
+    title: "Nieuw huis gevonden"
+
+plugins:
+  funda:
+    active: true
+    settings:
+
 comm:
   pushover:
     active: true
-    api_key: API_KEY
-    user_key: USER_KEY
+    api_key: "API_KEY"
+    user_key: "USER_KEY"
+
     """
 
     logging.basicConfig()
@@ -82,4 +101,4 @@ comm:
     while not po.is_ready():
         time.sleep(1)
 
-    po.send(input(": "))
+    po.send(msg=input(": "), url="https://home.hetverreoosten.com/")

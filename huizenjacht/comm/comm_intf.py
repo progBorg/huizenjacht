@@ -9,7 +9,7 @@ class Comm(ABC):
     Send a message to the user
     """
     @abstractmethod
-    def send(self, msg: str) -> int:
+    def send(self, msg: str, title: str, url: str) -> int:
         pass
 
     """
