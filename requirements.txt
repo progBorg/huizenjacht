@@ -1,3 +1,5 @@
 PyYAML~=6.0.2
 chump~=1.6.0
 requests~=2.32.3
+beautifulsoup4~=4.12.3
+fake-useragent~=2.0.3
