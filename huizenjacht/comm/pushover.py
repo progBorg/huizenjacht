@@ -34,7 +34,7 @@ class Pushover(Comm):
         if title is None:
             title = self._default_title
 
-        url_title = urlparse(url).netloc
+        url_title = urlparse(url).netloc if url is not None else None
         message = self._rcpt.create_message(message=msg, title=title, url=url, url_title=url_title)
         message.send()
         return message
@@ -67,7 +67,7 @@ class Pushover(Comm):
             if value is not None:
                 self.logger.debug(f"{name}: {value}")
 
-        logger.info("Configuration sanity check successful")
+        self.logger.info("Configuration sanity check successful")
 
 if __name__ == "__main__":
     # Quick functionality tests for this class

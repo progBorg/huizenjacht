@@ -3,5 +3,5 @@ __all__ = [
     "Pushover",
 ]
 
-from comm_intf import Comm
-from pushover import Pushover
+from .comm_intf import Comm
+from .pushover import Pushover

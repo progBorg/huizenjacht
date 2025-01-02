@@ -1,14 +1,32 @@
 ---
 server:
   debug: false
+  simulate: false
+  db: huizenjacht.db
+  message_defaults:
+    title: "Nieuw huis gevonden"
 
-plugins:
+sources:
+#  Source names should be exactly the same as the filename in which the source object is stored
   funda:
     active: true
-    settings:
+    areas: [
+      "enschede",
+    ]
+    buy_or_rent: "rent"
+    min_price: 0
+    max_price: 1100
+    min_rooms: 2
+    max_rooms: 0
+    property_type: [
+      "woonhuis",
+      "appartement",
+    ]
+    sort_by: "date_down"
 
 comm:
+#  Comm names should be exactly the same as the filename in which the comm object is stored
   pushover:
     active: true
-    api_key: APIKEY_HERE
-    user_key: USERKEY_HERE
+    api_key: "APIKEY_HERE"
+    user_key: "USERKEY_HERE"

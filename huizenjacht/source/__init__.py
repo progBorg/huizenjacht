@@ -3,5 +3,5 @@ __all__ = [
     "Source",
 ]
 
-from source_intf import Source
-from funda import Funda
+from .source_intf import Source
+from .funda import Funda

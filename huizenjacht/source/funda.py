@@ -102,9 +102,9 @@ CREATE TABLE IF NOT EXISTS "Funda" (
 
         buy_or_rent = self.conf_value("buy_or_rent")
         if not buy_or_rent in ("buy", "koop", "rent", "huur"):
-            raise ValueError('Config entry buy_or_rent must be one of [buy, rent, koop, huur]')
+            raise ValueError(f'Config entry buy_or_rent must be one of [buy, rent, koop, huur], is now "{buy_or_rent}"')
 
-        logger.info("Configuration sanity check successful")
+        self.logger.info("Configuration sanity check successful")
 
     def _setup_from_conf(self):
         # Build base url
@@ -164,6 +164,6 @@ sources:
     houses = f.get()
 
     for h in houses:
-        print(f.is_new(h))
+        print(f"{h}: {'new' if f.is_new(h) else 'old'}")
 
     f._conn.commit()
