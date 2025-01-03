@@ -2,9 +2,15 @@
 server:
   debug: false
   simulate: false
-  db: huizenjacht.db
-  message_defaults:
-    title: "Nieuw huis gevonden"
+  db: "huizenjacht.db"  # file location of database
+  poll_time_min: 1  # seconds
+  poll_time_max: 3  # seconds
+  message_strings:
+    default_title: "Nieuw huis gevonden"
+    default_title_plural: "Nieuwe huizen gevonden"
+    server_info_msg_title: "Systeemmelding"
+    server_startup_msg_text: "De huizenjager is (opnieuw) opgestart"
+    and: "en"
 
 sources:
 #  Source names should be exactly the same as the filename in which the source object is stored
