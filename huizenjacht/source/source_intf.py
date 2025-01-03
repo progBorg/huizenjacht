@@ -37,7 +37,7 @@ class Source(ABC):
         pass
 
     """
-    Check whether the provided house is newly found
+    Add house to database and check whether the provided house is newly found
     """
     @abstractmethod
     def is_new(self, house: Any) -> bool:

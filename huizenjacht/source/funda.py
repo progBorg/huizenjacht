@@ -95,6 +95,8 @@ CREATE TABLE IF NOT EXISTS "Funda" (
         except sqlite3.IntegrityError:
             return False
 
+        self._conn.commit()
+
         return True
 
     def _sanity_check_conf(self):

@@ -20,7 +20,7 @@ class Pushover(Comm):
         self.logger = logging.getLogger(__name__)
 
         conf = Config().config
-        self._default_title = conf['server']['message_defaults']['title']
+        self._default_title = conf['server']['message_strings']['default_title']
         self.conf = conf['comm']['pushover']
         self._sanity_check_conf()
 
@@ -74,21 +74,15 @@ if __name__ == "__main__":
     conf_text = """
 ---
 server:
-  debug: false
+  debug: true
   message_defaults:
     title: "Nieuw huis gevonden"
-
-plugins:
-  funda:
-    active: true
-    settings:
 
 comm:
   pushover:
     active: true
     api_key: "API_KEY"
     user_key: "USER_KEY"
-
     """
 
     logging.basicConfig()
