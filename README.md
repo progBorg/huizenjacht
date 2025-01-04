@@ -9,14 +9,16 @@ Scrape housing websites and push new results to the user.
 ### Communication methods
 - [x] Pushover
 
+### To Do
+- [x] Create basics
+- [ ] Endurance test
+- [ ] Make more sources
+
 ## Prerequisites
 This package has been built for Python v3.10 on Linux.
 If you use a different Python version, this software may not work as expected.
 
 ## Installation
-
-### Environment Setup
-- [ ] TODO: Everything :\
 
 ### Installing Huizenjacht
 - Clone this repository to your device, e.g., `git clone https://github.com/progBorg/huizenjacht.git ~/huizenjacht`
