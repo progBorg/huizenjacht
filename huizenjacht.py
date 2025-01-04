@@ -10,6 +10,11 @@ import importlib
 import sqlite3
 import sys
 import traceback
+import signal
+try:  # Will fail if not on Linux
+    import systemd.daemon
+except ImportError:
+    pass  # Fail silently and log later
 
 import inflection
 import time
@@ -23,12 +28,23 @@ from huizenjacht.config import Config
 PROGRAM_VERSION: str = "0.1"
 
 def main():
-    # Parse command-line arguments
-    args = parse_arguments()
-
     # Set up logging, include systemd Journal support
     logging.basicConfig()
     logger = logging.getLogger()
+
+    # Implement reloading via SIGHUP if supported by system
+    try:
+        signal.signal(signal.SIGHUP, reload)
+    except AttributeError:
+        logger.info("SIGHUP not supported by system, support for configuration reloading disabled")
+
+    # Parse command-line arguments
+    args = parse_arguments()
+
+    try:
+        systemd.daemon
+    except NameError:
+        logger.info("Could not import systemd daemon interface, skipping...")
 
     # set up global configuration
     conf = Config(config_file=args.configfile).config
@@ -47,6 +63,7 @@ def main():
     db = sqlite3.connect(conf["server"]["db"])
 
     hj = Huizenjacht(db)
+    systemd_notify('READY=1')
 
     # Handle seeding of database
     if args.reseed:
@@ -62,6 +79,8 @@ def main():
             hj.run()
             time.sleep(random.randint(min_waiting_time, max_waiting_time))
     finally:
+        systemd_notify('STOPPING=1')
+
         exc_type, exc_instance, _ = sys.exc_info()
         if not (exc_type, exc_instance) == (None, None):
             # An exception exists, notify all comms
@@ -74,6 +93,21 @@ def main():
                 hj.send_msg(c, msg=msg, title=title)
 
     return 0
+
+def reload(sig: int, frame):
+    systemd_notify(f'RELOADING=1\nMONOTONIC_USEC={time.monotonic_ns() // 1000}')
+
+    logger = logging.getLogger()
+    logger.warning("Reload requested, but reloading is not supported yet")
+
+    systemd_notify('READY=1')
+
+def systemd_notify(message: str):
+    try:
+        systemd.daemon.notify(message)
+    except NameError:
+        # Silently ignore if systemd is not on this system
+        pass
 
 class Huizenjacht:
     # Class constants

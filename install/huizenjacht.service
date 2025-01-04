@@ -1,10 +1,10 @@
 [Unit]
-Description=Scrape and push newly available housing
+Description=House Hunter
 Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
-Type=simple
+Type=notify-reload
 WorkingDirectory=/usr/share/huizenjacht
 Restart=on-failure
 PIDFile=/run/huizenjacht.pid
