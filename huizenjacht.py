@@ -65,13 +65,12 @@ def main():
         exc_type, exc_instance, _ = sys.exc_info()
         if not (exc_type, exc_instance) == (None, None):
             # An exception exists, notify all comms
-            for c in hj.comms:
-                msg = f"""{conf["server"]["message_strings"]["server_shutdown_msg_text"]}
+            msg = f"""{conf["server"]["message_strings"]["server_shutdown_msg_text"]}
 
 {exc_type.__name__}:
-{traceback.format_exc()}
-"""
-                title = conf["server"]["message_strings"]["server_info_msg_title"]
+{traceback.format_exc(limit=2)}"""
+            title = conf["server"]["message_strings"]["server_info_msg_title"]
+            for c in hj.comms:
                 hj.send_msg(c, msg=msg, title=title)
 
     return 0

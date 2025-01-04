@@ -28,8 +28,13 @@ class Pushover(Comm):
         self._rcpt = self._pushover.get_user(self.rcpt)
 
     def send(self, msg: str, title: str = None, url: str = None) -> chump.Message | None:
-        if len(str(msg)) == 0:
+        msg = str(msg)
+
+        if len(msg) == 0:
             return None
+
+        # Truncate msg size if necessary
+        msg = msg[:1021] + '...' if len(msg) > 1024 else msg  # Limit msg length
 
         if title is None:
             title = self._default_title
