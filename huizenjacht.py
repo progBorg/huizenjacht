@@ -63,7 +63,7 @@ def main():
             time.sleep(random.randint(min_waiting_time, max_waiting_time))
     finally:
         exc_type, exc_instance, _ = sys.exc_info()
-        if not (exc_type, exc_instance) == (None, None, None):
+        if not (exc_type, exc_instance) == (None, None):
             # An exception exists, notify all comms
             for c in hj.comms:
                 msg = f"""{conf["server"]["message_strings"]["server_shutdown_msg_text"]}
