@@ -8,6 +8,9 @@ import argparse
 import logging
 import importlib
 import sqlite3
+import sys
+import traceback
+
 import inflection
 import time
 import random
@@ -58,9 +61,18 @@ def main():
         while True:
             hj.run()
             time.sleep(random.randint(min_waiting_time, max_waiting_time))
-    except KeyboardInterrupt:
-        logger.info("Exiting due to KeyboardInterrupt")
-        pass
+    finally:
+        exc_type, exc_instance, _ = sys.exc_info()
+        if not (exc_type, exc_instance) == (None, None, None):
+            # An exception exists, notify all comms
+            for c in hj.comms:
+                msg = f"""{conf["server"]["message_strings"]["server_shutdown_msg_text"]}
+
+{exc_type.__name__}:
+{traceback.format_exc()}
+"""
+                title = conf["server"]["message_strings"]["server_info_msg_title"]
+                hj.send_msg(c, msg=msg, title=title)
 
     return 0
 
@@ -205,10 +217,11 @@ class Huizenjacht:
     """Send a message to specified comm object"""
     def send_msg(self, comm: Comm, msg: str, title: str = None, url: str = None) -> int:
         if not self.conf["server"]["simulate"]:
-            comm.send(msg=msg, title=title, url=url)
             self.logger.debug(f"msg to {type(comm).__name__}: t'{title}' m'{msg}' u'{url}'")
+            return comm.send(msg=msg, title=title, url=url)
         else:
             self.logger.info(f"sim-msg to {type(comm).__name__}: t'{title}' m'{msg}' u'{url}'")
+            return 0
 
 
 def parse_arguments():
@@ -226,4 +239,4 @@ def parse_arguments():
 
 if __name__ == "__main__":
     exit_code = main()
-    exit(exit_code)
+    sys.exit(exit_code)

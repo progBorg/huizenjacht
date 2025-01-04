@@ -10,6 +10,7 @@ server:
     default_title_plural: "Nieuwe huizen gevonden"
     server_info_msg_title: "Systeemmelding"
     server_startup_msg_text: "De huizenjager is (opnieuw) opgestart"
+    server_shutdown_msg_text: "De huizenjager is gestopt"
     and: "en"
 
 sources:
