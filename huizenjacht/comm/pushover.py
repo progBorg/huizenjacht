@@ -34,7 +34,7 @@ class Pushover(Comm):
             return None
 
         # Truncate msg size if necessary
-        msg = msg[:1021] + '...' if len(msg) > 1024 else msg  # Limit msg length
+        msg = msg[:1020] + '...' if len(msg) >= 1024 else msg  # Limit msg length
 
         if title is None:
             title = self._default_title
