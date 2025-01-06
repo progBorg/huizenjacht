@@ -13,6 +13,14 @@ class Funda(Source):
 
     # Constants
     BASE_URL = "https://www.funda.nl/zoeken/"
+    _allowed_property_types = {
+        "woonhuis": "house",
+        "house": "house",
+        "appartement": "apartment",
+        "apartment": "apartment",
+        "parkeergelegenheid": "parking",
+        "parking": "parking",
+    }
     _db_table_create_stmt = '''
 CREATE TABLE IF NOT EXISTS "Funda" (
 	"id"	INTEGER NOT NULL UNIQUE,
@@ -110,24 +118,38 @@ CREATE TABLE IF NOT EXISTS "Funda" (
 
     def _setup_from_conf(self):
         # Build base url
-        buy_or_rent = self.conf_value("buy_or_rent")
-        url = urljoin(self.BASE_URL, "koop" if buy_or_rent in ("koop", "buy") else "huur")
+        buy_or_rent = "koop" if self.conf_value("buy_or_rent") in ("koop", "buy") else "huur"
+        url = urljoin(self.BASE_URL, buy_or_rent)
 
         # Get values and build url parameters
         url_params = {
-            "selected_area": self.conf_value("area"),
-            "min_price": self.conf_value("min_price", None),
-            "max_price": self.conf_value("max_price", None),
-            "min_rooms": self.conf_value("min_rooms", None),
-            "max_rooms": self.conf_value("max_rooms", None),
-            "property_type": self.conf_value("property_type", "woonhuis"),
-            "sort_by": self.conf_value("sort_by", "date-down"),
+            "selected_area": self.conf_value("areas"),
+            "sort_by": f'"{self.conf_value("sort_by", "date-down")}"',
+            "offering_type": f'"{buy_or_rent}"',
+            "availability": '["available"]',
         }
+        min_price = self.conf_value("min_price", '')
+        max_price = self.conf_value("max_price", '')
+        min_rooms = self.conf_value("min_rooms", '')
+        max_rooms = self.conf_value("max_rooms", '')
 
+        # Parse search area
         if isinstance(url_params["selected_area"], str):
             url_params["selected_area"] = f'["{url_params["selected_area"]}"]'
         elif isinstance(url_params["selected_area"], list):
             url_params["selected_area"] = '[' + ','.join(f'"{city}"' for city in url_params["selected_area"]) + ']'
+
+        # Parse property type
+        property_type = self.conf_value("property_type", "woonhuis")
+        try:
+            property_type = [self._allowed_property_types[prop] for prop in property_type]
+        except KeyError:
+            raise KeyError(f"Config value 'property_type' in Funda source contains an entry that is not one of {[k for k in self._allowed_property_types.keys()]}")
+
+        # Parse other url params
+        url_params["price"] = f'"{min_price}-{"" if max_price == 0 else max_price}"'
+        url_params["rooms"] = f'"{min_rooms}-{"" if max_rooms == 0 else max_rooms}"'
+        url_params["object_type"] = '[' + ','.join(f'"{otype}"' for otype in property_type) + ']'
 
         # Filter out keys with None value
         url_params = {k: v for k, v in url_params.items() if v is not None}
