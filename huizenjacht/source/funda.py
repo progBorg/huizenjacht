@@ -78,11 +78,15 @@ CREATE TABLE IF NOT EXISTS "Funda" (
         headers["User-Agent"] = self._ua.random
 
         # Do request
-        res = requests.get(
-            url=self._req_url,
-            params=self._req_url_params,
-            headers=headers,
-        )
+        try:
+            res = requests.get(
+                url=self._req_url,
+                params=self._req_url_params,
+                headers=headers,
+            )
+        except ConnectionError as exc:
+            self.logger.exception("Could not connect to Funda", exc_info=exc)
+            return None
 
         if res.status_code != 200:
             self.logger.warning("Could not reach Funda page successfully, http status code %i", res.status_code)
@@ -96,7 +100,7 @@ CREATE TABLE IF NOT EXISTS "Funda" (
             urls_json = json.loads("".join(soup.find("script", {"type": "application/ld+json"}).contents[0]))
             urls = [item["url"] for item in urls_json["itemListElement"]]
         except AttributeError as exc:
-            logger.info(f"Failed to retrieve Funda urls from query with parameters {self._req_url_params}")
+            logger.exception(f"Failed to retrieve Funda urls from webpage, used query with parameters {self._req_url_params}", exc_info=exc)
             urls = None
 
         return urls

@@ -87,10 +87,11 @@ def main():
             msg = f"""{conf["server"]["message_strings"]["server_shutdown_msg_text"]}
 
 {exc_type.__name__}:
-{traceback.format_exc(limit=2)}"""
+{traceback.format_exc(limit=3)}"""
             title = conf["server"]["message_strings"]["server_info_msg_title"]
             for c in hj.comms:
                 hj.send_msg(c, msg=msg, title=title)
+            return 1
 
     return 0
 
@@ -157,8 +158,9 @@ class Huizenjacht:
         self.DEFAULT_MSG_TITLE_PLURAL = self.conf["server"]["message_strings"]["default_title_plural"]
 
         # Send a startup message
-        for comm in self.comms:
-            self.send_msg(comm, msg=self.STARTUP_COMM_MSG_TEXT, title=self.SERVER_COMM_MSG_TITLE)
+        if self.STARTUP_COMM_MSG_TEXT not in (None, ''):
+            for comm in self.comms:
+                self.send_msg(comm, msg=self.STARTUP_COMM_MSG_TEXT, title=self.SERVER_COMM_MSG_TITLE)
 
     def run(self):
         """Go once through all sources and push new houses to all comms"""
@@ -249,11 +251,12 @@ class Huizenjacht:
 
     """Send a message to specified comm object"""
     def send_msg(self, comm: Comm, msg: str, title: str = None, url: str = None) -> int:
+        one_line_msg = '|\t'.join([line.strip() for line in msg.splitlines()])
         if not self.conf["server"]["simulate"]:
-            self.logger.debug(f"msg to {type(comm).__name__}: t'{title}' m'{msg}' u'{url}'")
+            self.logger.debug(f"msg to {type(comm).__name__}: t'{title}' m'{one_line_msg}' u'{url}'")
             return comm.send(msg=msg, title=title, url=url)
         else:
-            self.logger.info(f"sim-msg to {type(comm).__name__}: t'{title}' m'{msg}' u'{url}'")
+            self.logger.info(f"sim-msg to {type(comm).__name__}: t'{title}' m'{one_line_msg}' u'{url}'")
             return 0
 
 
