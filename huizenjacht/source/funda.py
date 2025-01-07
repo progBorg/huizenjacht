@@ -91,9 +91,13 @@ CREATE TABLE IF NOT EXISTS "Funda" (
         return BeautifulSoup(res.text, features="html.parser")
 
     def _parse_response(self, soup: BeautifulSoup) -> list:
-        # Get urls
-        urls_json = json.loads("".join(soup.find("script", {"type": "application/ld+json"}).contents[0]))
-        urls = [item["url"] for item in urls_json["itemListElement"]]
+        try:
+            # Get urls
+            urls_json = json.loads("".join(soup.find("script", {"type": "application/ld+json"}).contents[0]))
+            urls = [item["url"] for item in urls_json["itemListElement"]]
+        except AttributeError as exc:
+            logger.info(f"Failed to retrieve Funda urls from query with parameters {self._req_url_params}")
+            urls = None
 
         return urls
 
