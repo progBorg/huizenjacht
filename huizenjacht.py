@@ -201,7 +201,7 @@ class Huizenjacht:
             return
 
         # Parse some information
-        new_houses_count = sum([len(h) for h in new_houses])
+        new_houses_count = sum([len(new_houses[h]) for h in new_houses])
         new_houses_sources = new_houses.keys()
         new_houses_sources = ', '.join(new_houses_sources)
         self.logger.info(f"Found {new_houses_count} new houses on {new_houses_sources}")
@@ -215,7 +215,7 @@ class Huizenjacht:
             msg = f"Er zijn {new_houses_count} nieuwe huizen gevonden op {new_houses_sources}"
 
         try:  # Funda has high priority
-            url = new_houses[type(Funda).__name__][0]
+            url = new_houses['Funda'][0]
         except KeyError:  # If no funda house, just get the first one available
             url = next(iter(new_houses.values()))[0]
 
